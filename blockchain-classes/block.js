@@ -8,11 +8,12 @@ class Block{
     // --hash (This blocks hash)
     // --data (Data that will be stored in the blockchain. In this case
     //          votes)
-    constructor(timestamp, lastHash, hash, data){
+    constructor(timestamp, lastHash, hash, data, nonce){
         this.timestamp = timestamp;
         this.lastHash = lastHash;
         this.hash = hash;
         this.data = data;
+        this.nonce = nonce;
     }
 
     //Retrun a string reprensatation of the block
@@ -21,6 +22,7 @@ class Block{
             Timestamp: ${this.timestamp}
             Last Hash: ${this.lastHash}
             Hash     : ${this.hash}
+            Nonce    : ${this.nonce}
             Data     : ${this.data}`
     }
 
@@ -28,7 +30,7 @@ class Block{
     //the a block need a lastHash, the gensesis blocks hash will
     //be used if none other exists
     static genesisBlock(){
-        return new this('Genesis Time', '**null**', '**KD-LyIt**', []);
+        return new this('Genesis Time', '**null**', '**KD-LyIt**', [], 0);
     }
 
     //Static method to mine a block into the blockchain
@@ -43,13 +45,13 @@ class Block{
     //Uses the CONST SHA256 created at the top to create a one-way
     //hash of the current block by taking in its data and running
     //it through the hashing algorithm
-    static generateHash(timestamp, lastHash, data){
-        return SHA256(`${timestamp}${lastHash}${data}`).toString();
+    static generateHash(timestamp, lastHash, data, nonce){
+        return SHA256(`${timestamp}${lastHash}${data}${nonce}`).toString();
     }
 
     static getBlockHash(block){
-        const { timestamp, lastHash, data } = block;
-        return Block.generateHash(timestamp, lastHash, data);
+        const { timestamp, lastHash, data, nonce } = block;
+        return Block.generateHash(timestamp, lastHash, data, nonce);
     }
 }
 
