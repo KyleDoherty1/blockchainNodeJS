@@ -35,11 +35,23 @@ class Block{
 
     //Static method to mine a block into the blockchain
     static mineBlock(lastBlock, data){
-        const timestamp = Date.now();
+        let timestamp;
         const lastHash = lastBlock.hash;
-        const hash = Block.generateHash(timestamp, lastHash, data);
-        
-        return new this(timestamp, lastHash, hash, data);
+        let nonce = 0;
+        //const hash = Block.generateHash(timestamp, lastHash, data, nonce);
+        return Block.proofOfWork(nonce, timestamp, lastHash, data)
+    }
+
+    //Proof of Work method to make sure the hash is correct
+    static proofOfWork(nonce, timestamp, lastHash, data){
+        let hash;
+        do{
+            nonce++;
+            timestamp = Date.now();
+            hash = Block.generateHash(timestamp, lastHash, data, nonce)
+        }while(hash.substring(0, 3) !== '000')
+
+        return new this(timestamp, lastHash, hash, data, nonce);
     }
 
     //Uses the CONST SHA256 created at the top to create a one-way
