@@ -17,4 +17,9 @@ describe('Block', () => {
     it('Block sets its `lastHash to match the hash of the last block', () => {
         expect(block.lastHash).toEqual(lastBlock.hash);
     });
+
+    it('generates a hash that matches the diffuculty of 3 zeros before the hash', () =>{
+        expect(block.hash.substring(0,3)).toEqual('000');
+        console.log(block.toString());
+    });
 });
