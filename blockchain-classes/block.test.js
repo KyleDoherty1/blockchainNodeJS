@@ -1,4 +1,5 @@
 const Block = require('./block');
+const {MiningDifficulty} = require('../config');
 
 describe('Block', () => {
 
@@ -19,7 +20,7 @@ describe('Block', () => {
     });
 
     it('generates a hash that matches the diffuculty of 3 zeros before the hash', () =>{
-        expect(block.hash.substring(0,3)).toEqual('000');
+        expect(block.hash.substring(0,MiningDifficulty)).toEqual('0'.repeat(MiningDifficulty));
         console.log(block.toString());
     });
 });
