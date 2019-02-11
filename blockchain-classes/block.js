@@ -1,5 +1,5 @@
 const SHA256 = require('crypto-js/sha256');
-const {MiningDifficulty} = require('../config');
+const {MINING_DIFFUCULTY, MINE_RATE} = require('../config');
 class Block{
     //Single Block Constructor
     // --timestamp (When the block is created)
@@ -8,29 +8,31 @@ class Block{
     // --hash (This blocks hash)
     // --data (Data that will be stored in the blockchain. In this case
     //          votes)
-    constructor(timestamp, lastHash, hash, data, nonce){
+    constructor(timestamp, lastHash, hash, data, nonce, difficulty){
         this.timestamp = timestamp;
         this.lastHash = lastHash;
         this.hash = hash;
         this.data = data;
         this.nonce = nonce;
+        this.difficulty = difficulty || MINING_DIFFUCULTY;
     }
 
     //Retrun a string reprensatation of the block
     toString(){
         return `Block -
-            Timestamp: ${this.timestamp}
-            Last Hash: ${this.lastHash}
-            Hash     : ${this.hash}
-            Nonce    : ${this.nonce}
-            Data     : ${this.data}`
+            Timestamp  : ${this.timestamp}
+            Last Hash  : ${this.lastHash}
+            Hash       : ${this.hash}
+            Nonce      : ${this.nonce}
+            Difficulty : ${this.difficulty}
+            Data       : ${this.data}`
     }
 
     //Static method for creating the true first block. Since
     //the a block need a lastHash, the gensesis blocks hash will
     //be used if none other exists
     static genesisBlock(){
-        return new this('Genesis Time', '**null**', '**KD-LyIt**', [], 0);
+        return new this('Genesis Time', '**null**', '**KD-LyIt**', [], 0, MINING_DIFFUCULTY);
     }
 
     //Static method to mine a block into the blockchain
@@ -39,31 +41,49 @@ class Block{
         const lastHash = lastBlock.hash;
         let nonce = 0;
         //const hash = Block.generateHash(timestamp, lastHash, data, nonce);
-        return Block.proofOfWork(nonce, timestamp, lastHash, data)
+        return Block.proofOfWork(nonce, timestamp, lastHash, data, lastBlock)
     }
 
     //Proof of Work method to make sure the hash is correct
-    static proofOfWork(nonce, timestamp, lastHash, data){
+    static proofOfWork(nonce, timestamp, lastHash, data, lastBlock){
         let hash;
+        let {difficulty} = lastBlock;
         do{
             nonce++;
             timestamp = Date.now();
-            hash = Block.generateHash(timestamp, lastHash, data, nonce)
-        }while(hash.substring(0, MiningDifficulty) !== '0'.repeat(MiningDifficulty))
+            //Get the difficulty of the block (amount of 0's before the hash)
+            difficulty = Block.changeDifficulty(lastBlock, timestamp)
+            hash = Block.generateHash(timestamp, lastHash, data, nonce, difficulty)
+        }while(hash.substring(0, difficulty) !== '0'.repeat(difficulty))
 
-        return new this(timestamp, lastHash, hash, data, nonce);
+        return new this(timestamp, lastHash, hash, data, nonce, difficulty);
     }
 
     //Uses the CONST SHA256 created at the top to create a one-way
     //hash of the current block by taking in its data and running
     //it through the hashing algorithm
-    static generateHash(timestamp, lastHash, data, nonce){
-        return SHA256(`${timestamp}${lastHash}${data}${nonce}`).toString();
+    static generateHash(timestamp, lastHash, data, nonce, difficulty){
+        return SHA256(`${timestamp}${lastHash}${data}${nonce}${difficulty}`).toString();
     }
 
     static getBlockHash(block){
-        const { timestamp, lastHash, data, nonce } = block;
-        return Block.generateHash(timestamp, lastHash, data, nonce);
+        const { timestamp, lastHash, data, nonce, difficulty } = block;
+        return Block.generateHash(timestamp, lastHash, data, nonce, difficulty);
+    }
+    
+    //Calculates the difficulty of the block to be mined
+    static changeDifficulty( lastBlock, currentTime){
+        //Get difficulty of last block
+        let {difficulty} = lastBlock;
+        //If the last blocks timestamp + the mine rate(4s) is greater than the
+        //current time its mined to quickly 
+        if(lastBlock.timestamp + MINE_RATE > currentTime)
+            difficulty += 1;
+        //Else of it didnt mine quick enough we decrease the difficulty
+        else
+            difficulty -= 1;
+        
+        return difficulty;
     }
 }
 
