@@ -83,7 +83,7 @@ class Block{
         else
             difficulty -= 1;
         
-        return difficulty;
+        return difficulty; 
     }
 }
 
