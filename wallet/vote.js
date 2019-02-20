@@ -4,8 +4,7 @@ const ChainUtil = require('../chain-util');
 class Vote {
   constructor() {
     this.id = ChainUtil.id();
-    this.input = null;
-    this.outputs = [];
+    this.candidate = null;
   }
 
   //Create a new vote 

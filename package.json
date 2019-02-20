@@ -20,6 +20,7 @@
     "crypto-js": "^3.1.9-1",
     "elliptic": "^6.4.1",
     "express": "^4.16.4",
+    "nodemailer": "^5.1.1",
     "nodemon": "^1.18.9",
     "twilio": "^3.28.0",
     "uuid": "^3.3.2",
