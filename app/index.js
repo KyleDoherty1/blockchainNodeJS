@@ -7,6 +7,7 @@ var verifiedVoters = require('./verifiedVoters.json');
 var WalletManager = require('../wallet/walletManager');
 var nodemailer = require('nodemailer');
 const client = require('twilio')(TWILIO_SID, TWILIO_AUTH_TOKEN);
+var _ = require('underscore');
 
 //If there isnt a env variable passed into the npm run dev
 //the default port is 3001.
@@ -28,7 +29,7 @@ const blockchain = new Blockchain;
 //Create the instance if the P2P Server
 const p2pServer = new P2PServer(blockchain);
 
-var wallets = new WalletManager;
+var walletManager = new WalletManager;
 
 //Current routes atm, will try to move them to a routes.js soon
 app.get('/voters', (req, res) => {
@@ -40,31 +41,51 @@ app.get('/blocks', (req, res) => {
 });
 
 app.post('/mine', (req, res) => {
-    console.log(req.body.body);
-    const block = blockchain.addBlock(req.body.body);
+    console.log(req.body.data);
+    const block = blockchain.addBlock(req.body.data);
     console.log(`New block added: ${block.toString()}`);
     p2pServer.updateChains();
     res.redirect('/blocks');
 });
 
 app.post('/verifypk', (req, res) => {
-    console.log(req.body.pk);
-    console.log(wallets.getWallets);
+
+    if(walletManager.doesPkExist(req.body.pk))
+    {
+        console.log("true");
+        res.send(true);
+    }
+    else
+        console.log("false");
+
+    res.end();
 });
 
 app.get('/newwallet/:email', (req, res) => {
 
      var email = req.params.email;
     console.log(email);
-    var pk = wallets.addWallet(email);
+    var pk = walletManager.addWallet(email);
     console.log("PRIVATE KEY:  " + pk);
-    var phone = req.body.data;
+    var phone;
+    //console.log(verifiedVoters,voters);
+
+    function findVoter(element) { 
+        if(element.email===email)
+            return true;
+    }
+
+     var voter=_.find(verifiedVoters.voters, findVoter)
+    // console.log(voter.phone);
+    // var datagood = $.grep(verifiedVoters.voters, function (item) {
+    //     return item.email.eqemail;
+    // });
 
     client.messages
     .create({
         body: 'Your private key is: ' + pk,
         from: '+12533365589',
-        to: '+353831362447'
+        to: '+'+voter.phone
     })
     .then(message => console.log(message.sid));
     
@@ -80,7 +101,7 @@ app.get('/newwallet/:email', (req, res) => {
         from: 'kyledoherty1@gmail.com',
         to: email,
         subject: 'Private Key',
-        text:  ""+pk
+        text: ""+pk
       };
       
       transporter.sendMail(mailOptions, function(error, info){
@@ -90,6 +111,8 @@ app.get('/newwallet/:email', (req, res) => {
           console.log('Email sent: ' + info.response);
         }
       });
+
+      res.send();
 });
 
 

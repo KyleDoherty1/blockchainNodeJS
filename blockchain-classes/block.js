@@ -80,7 +80,7 @@ class Block{
         if(lastBlock.timestamp + MINE_RATE > currentTime)
             difficulty += 1;
         //Else of it didnt mine quick enough we decrease the difficulty
-        else
+        else if(difficulty > 2)
             difficulty -= 1;
         
         return difficulty; 

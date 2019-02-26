@@ -33,6 +33,14 @@ class Wallet {
       var vote = Vote.newVote(this, recipient, amount);
   }
 
+  getPK(){
+    return this.privateKey;
+  }
+
+  getEmail(){
+    return this.email;
+  }
+
 }
 
 module.exports = Wallet;
