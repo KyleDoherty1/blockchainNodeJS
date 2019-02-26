@@ -20,6 +20,14 @@ class ChainUtil{
     static verifySignature(publicKey, signature, dataHash){
         return ec.keyFromPublic(publicKey, 'hex').verify(dataHash, signature);
     }
+
+    static extractPrivateKey(keyPair)
+	{
+		var temp = JSON.parse(JSON.stringify(keyPair));
+		var key=temp.priv;
+		const privateKeyPair = ec.keyFromPrivate(key);
+		return privateKeyPair;
+	} 
 }
 
 module.exports = ChainUtil;
