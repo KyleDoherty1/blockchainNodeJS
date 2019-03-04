@@ -8,6 +8,10 @@ var WalletManager = require('../wallet/walletManager');
 var nodemailer = require('nodemailer');
 const client = require('twilio')(TWILIO_SID, TWILIO_AUTH_TOKEN);
 var _ = require('underscore');
+var Candidate = require('../election/candidate');
+var Election = require('../election/election');
+var election;
+var candidates = [];
 
 //If there isnt a env variable passed into the npm run dev
 //the default port is 3001.
@@ -34,6 +38,30 @@ var walletManager = new WalletManager;
 //Current routes atm, will try to move them to a routes.js soon
 app.get('/voters', (req, res) => {
     res.json(verifiedVoters.voters);
+});
+
+app.post('/candidate', (req, res) => {
+   // console.log(req.body);
+    var x = new Candidate(req.body.name, req.body.party);
+    candidates.push(x);
+   // console.log(candidates);
+    res.redirect('/candidates');
+});
+
+app.get('/candidates', (req, res) => {
+    res.send(candidates);
+});
+
+app.post('/election', (req, res) => {
+    // console.log(req.body);
+     election = new Election(req.body.name, candidates);
+     //candidates.push(x);
+    // console.log(candidates);
+     res.redirect('/election');
+ });
+
+ app.get('/election', (req, res) => {
+    res.send(election);
 });
 
 app.get('/blocks', (req, res) => {
@@ -81,13 +109,13 @@ app.get('/newwallet/:email', (req, res) => {
     //     return item.email.eqemail;
     // });
 
-    client.messages
-    .create({
-        body: 'Your private key is: ' + pk,
-        from: '+12533365589',
-        to: '+'+voter.phone
-    })
-    .then(message => console.log(message.sid));
+    // client.messages
+    // .create({
+    //     body: 'Your private key is: ' + pk,
+    //     from: '+12533365589',
+    //     to: '+'+voter.phone
+    // })
+    // .then(message => console.log(message.sid));
     
     var transporter = nodemailer.createTransport({
         service: 'gmail',

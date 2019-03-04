@@ -29,8 +29,11 @@ class Wallet {
   }
 
   createVote(recipient, amount, pkEntered){
-    if(pkEntered == this.privateKey)
+    if(pkEntered == this.privateKey && this.balance == 1){
       var vote = Vote.newVote(this, recipient, amount);
+      this.balance -= 1;
+    }
+      
   }
 
   getPK(){

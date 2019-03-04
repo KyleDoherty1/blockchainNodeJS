@@ -1,16 +1,16 @@
-class Election{
-
-    constructor(voters, candidates){
-        this.voters = voters;
-        this.candidates = candidates;
+class Candidate{
+    constructor(nameIn, partyIn){
+        this.name = nameIn;
+        this.party = partyIn;
     }
 
-    getVoters(){
-        return this.voters;
+    getName(){
+        return this.name;
     }
 
-    getCandidates(){
-        return this.candidates;
+    getParty(){
+        return this.party;
     }
-    
 }
+
+module.exports = Candidate;
