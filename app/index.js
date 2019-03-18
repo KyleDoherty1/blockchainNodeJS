@@ -40,11 +40,12 @@ app.get('/voters', (req, res) => {
     res.json(verifiedVoters.voters);
 });
 
-app.post('/candidate', (req, res) => {
+app.post('/candidates', (req, res) => {
    // console.log(req.body);
     var x = new Candidate(req.body.name, req.body.party);
+    
     candidates.push(x);
-   // console.log(candidates);
+    console.log("Candidate added");
     res.redirect('/candidates');
 });
 
@@ -54,11 +55,31 @@ app.get('/candidates', (req, res) => {
 
 app.post('/election', (req, res) => {
     // console.log(req.body);
-     election = new Election(req.body.name, candidates);
-     //candidates.push(x);
-    // console.log(candidates);
-     res.redirect('/election');
+    if(election == undefined){
+        election = new Election(req.body.name, candidates);
+        console.log("Election created");
+        res.redirect('/election');
+    }
+    else
+        res.send("election already created");
  });
+
+ app.get('/countvotes', (req, res) => {
+    for(var i = 0; i < election.candidates.length; i++){
+        election.candidates[i].resetVote();    
+    }
+
+    for(var i = 0; i < blockchain.chain.length; i++){
+        if(blockchain.chain[i].data != null)
+        {
+            console.log(blockchain.chain[i].data);
+            election.addCandidateVote(blockchain.chain[i].data);
+        }
+            
+    }
+
+    
+});
 
  app.get('/election', (req, res) => {
     res.send(election);
@@ -83,8 +104,11 @@ app.post('/verifypk', (req, res) => {
         console.log("true");
         res.send(true);
     }
-    else
+    else{
         console.log("false");
+        res.status(404).send({ error: "Something is wrong"});
+    }
+        
 
     res.end();
 });

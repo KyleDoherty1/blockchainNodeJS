@@ -1,3 +1,5 @@
+var _ = require('underscore');
+
 class Election{
     constructor(nameIn, candidatesIn){
         this.candidates = candidatesIn;
@@ -15,6 +17,16 @@ class Election{
 
     getResults(){
         return this.result;
+    }
+
+    addCandidateVote(id){
+        var candidate = this.getCandidateById(id);
+        candidate.addVote();
+        console.log(candidate.getName());
+    }
+
+    getCandidateById(id){
+         return this.candidates.find(function (o) { return o.id == id; })
     }
 
     countVotes(){

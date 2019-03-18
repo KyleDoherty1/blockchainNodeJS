@@ -32,7 +32,7 @@ class Block{
     //the a block need a lastHash, the gensesis blocks hash will
     //be used if none other exists
     static genesisBlock(){
-        return new this('Genesis Time', '**null**', '**KD-LyIt**', [], 0, MINING_DIFFUCULTY);
+        return new this('Genesis Time', '**null**', '**KD-LyIt**', null, 0, MINING_DIFFUCULTY);
     }
 
     //Static method to mine a block into the blockchain
